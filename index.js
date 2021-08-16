@@ -48,8 +48,7 @@ const performLogin = async (page) => {
   await performLogin(page);
   print(`\r[+] Authenticated\n`, true);
   const target = await selectTarget(page);
-
-  // const availableCourses = await getAvailableCourses(page);
+  const availableCourses = await getAvailableCourses(page, target);
   // let selectedCourses = await getAnswers(availableCourses);
   // print(`[-] Fetching Lessons of each course...`, false);
   // selectedCourses = await getLessons(page, selectedCourses);
