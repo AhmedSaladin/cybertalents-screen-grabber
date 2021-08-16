@@ -185,7 +185,7 @@ const cleanupScreen = async (page) => {
   });
 };
 
-const getchallenge = async (page, url, challengePath) => {
+const savechallenge = async (page, url, challengePath) => {
   await page.goto(url, {
     waitUntil: "networkidle2",
   });
@@ -196,7 +196,7 @@ const getchallenge = async (page, url, challengePath) => {
   });
 };
 
-const getWriteUps = async (page, url, challengePath) => {
+const saveWriteUp = async (page, url, challengePath) => {
   await page.goto(`${url}/writeups`, {
     waitUntil: "networkidle2",
   });
@@ -226,8 +226,8 @@ const saveLessons = async (page, courses) => {
         const challengeName = courses[index].challenges[i].name;
         const challengePath = `${coursePath}${challengeName}${fileSeparator()}`;
         fs.mkdirSync(challengePath, { recursive: true });
-        await getchallenge(page, url, challengePath);
-        await getWriteUps(page, url, challengePath);
+        await savechallenge(page, url, challengePath);
+        await saveWriteUp(page, url, challengePath);
         challengesBar.increment();
       }
       loadingBar.remove(challengesBar);
