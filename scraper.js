@@ -162,7 +162,7 @@ const getLearnLessons = async (page, courses, index) => {
   });
 };
 
-const getLessons = async (page, courses, target) => {
+const getPageLessons = async (page, courses, target) => {
   try {
     for (let index = 0; index < courses.length; index++) {
       await page.goto(courses[index].url, {
@@ -216,7 +216,7 @@ const saveLesson = async (page) => {
   await saveChallenges(page, courses[index].lessons[i], lessonPath);
 };
 
-const saveLessons = async (page, courses, target) => {
+const savePageLessons = async (page, courses, target) => {
   try {
     for (let index = 0; index < courses.length; index++) {
       const coursePath = `${__dirname}${fileSeparator()}CyberTalents${fileSeparator()}${
@@ -267,7 +267,7 @@ module.exports = {
   print,
   getAvailableCourses,
   getAnswers,
-  getLessons,
-  saveLessons,
+  getPageLessons,
+  savePageLessons,
   selectTarget,
 };

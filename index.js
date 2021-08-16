@@ -4,8 +4,8 @@ const {
   print,
   getAvailableCourses,
   getAnswers,
-  getLessons,
-  saveLessons,
+  getPageLessons,
+  savePageLessons,
   selectTarget,
 } = require("./scraper.js");
 const puppeteer = require("puppeteer");
@@ -51,10 +51,10 @@ const performLogin = async (page) => {
   const availableCourses = await getAvailableCourses(page, target);
   let selectedCourses = await getAnswers(availableCourses);
   print(`[-] Fetching Lessons of each course...`, false);
-  selectedCourses = await getLessons(page, selectedCourses, target);
+  selectedCourses = await getPageLessons(page, selectedCourses, target);
   console.log(selectedCourses);
   print(`\r[+] Lessons Fetched\n`, true);
-  await saveLessons(page, selectedCourses, target);
+  await savePageLessons(page, selectedCourses, target);
   await browser.close();
   print(`\r[+] Downloaded and saved to "CyberTalentsLearn" folder\n`, true);
   process.exit();
