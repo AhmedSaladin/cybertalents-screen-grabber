@@ -37,23 +37,26 @@ const selectTarget = async (page) => {
   }
 };
 
+const getLearnPageCourses = async (page) => {
+  return await page.evaluate(() => {
+    const courses = [];
+    document
+      .querySelectorAll(".course-card > .card-body > .card-title")
+      .forEach((element) => {
+        const parent = element.parentElement.parentElement;
+        courses.push({
+          name: element.textContent.trim(),
+          url: parent.children[parent.childElementCount - 1].children[1].href,
+        });
+      });
+    return courses;
+  });
+};
+
 const getAvailableCourses = async (page, target) => {
   try {
     if (target === "LEARN") {
-      return await page.evaluate(() => {
-        const courses = [];
-        document
-          .querySelectorAll(".course-card > .card-body > .card-title")
-          .forEach((element) => {
-            const parent = element.parentElement.parentElement;
-            courses.push({
-              name: element.textContent.trim(),
-              url: parent.children[parent.childElementCount - 1].children[1]
-                .href,
-            });
-          });
-        return courses;
-      });
+      return await getLearnPageCourses(page);
     } else if (target === "PRACTICE") {
       return await page.evaluate(() => {
         const courses = [];
