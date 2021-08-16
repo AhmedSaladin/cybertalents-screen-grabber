@@ -216,14 +216,14 @@ const saveLesson = async (page) => {
   await saveChallenges(page, courses[index].lessons[i], lessonPath);
 };
 
-const savePracticeLessons = async (page, courses, index) => {
+const savePracticeLessons = async (page, courses, index, path) => {
   const challengesBar = loadingBar.create(courses[index].challenges.length, 1, {
     title: courses[index].name,
   });
   for (let i = 0; i < courses[index].challenges.length; i++) {
     const url = courses[index].challenges[i].url;
     const challengeName = courses[index].challenges[i].name;
-    const challengePath = `${coursePath}Practice${fileSeparator()}${
+    const challengePath = `${path}Practice${fileSeparator()}${
       courses[index].name
     }${fileSeparator()}${challengeName}${fileSeparator()}`;
     fs.mkdirSync(challengePath, { recursive: true });
@@ -234,30 +234,32 @@ const savePracticeLessons = async (page, courses, index) => {
   loadingBar.remove(challengesBar);
 };
 
+const saveLearnLessons = async (page, courses, index, path) => {
+  const lessonsBar = loadingBar.create(courses[index].lessons.length, 1, {
+    title: courses[index].name,
+  });
+  for (let i = 0; i < courses[index].lessons.length; i++) {
+    await page.goto(courses[index].lessons[i].url, {
+      waitUntil: "networkidle2",
+    });
+    const lessonName = courses[index].lessons[i].name;
+    const lessonPath = `${path}Learn${fileSeparator()}${
+      courses[index].name
+    }${lessonName}${fileSeparator()}`;
+    fs.mkdirSync(lessonPath, { recursive: true });
+    saveLesson(page);
+    lessonsBar.increment();
+  }
+  loadingBar.remove(lessonsBar);
+};
+
 const savePageLessons = async (page, courses, target) => {
   try {
     for (let index = 0; index < courses.length; index++) {
       const coursePath = `${__dirname}${fileSeparator()}CyberTalents${fileSeparator()}`;
-      if (target === "PRACTICE") {
-        await savePracticeLessons(page, courses, index);
-      } else {
-        const lessonsBar = loadingBar.create(courses[index].lessons.length, 1, {
-          title: courses[index].name,
-        });
-        for (let i = 0; i < courses[index].lessons.length; i++) {
-          await page.goto(courses[index].lessons[i].url, {
-            waitUntil: "networkidle2",
-          });
-          const lessonName = courses[index].lessons[i].name;
-          const lessonPath = `${coursePath}Learn${fileSeparator()}${
-            courses[index].name
-          }${lessonName}${fileSeparator()}`;
-          fs.mkdirSync(lessonPath, { recursive: true });
-          saveLesson(page);
-          lessonsBar.increment();
-        }
-        loadingBar.remove(lessonsBar);
-      }
+      if (target === "PRACTICE")
+        await savePracticeLessons(page, courses, index, coursePath);
+      else await saveLearnLessons(page, courses, index, coursePath);
     }
     loadingBar.stop();
   } catch (err) {
