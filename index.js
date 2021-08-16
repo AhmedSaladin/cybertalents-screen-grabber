@@ -1,7 +1,13 @@
-'use strict';
-require('dotenv').config();
-const { print, getAvailableCourses, getAnswers, getLessons, saveLessons } = require('./scraper.js');
-const puppeteer = require('puppeteer');
+"use strict";
+require("dotenv").config();
+const {
+  print,
+  getAvailableCourses,
+  getAnswers,
+  getLessons,
+  saveLessons,
+} = require("./scraper.js");
+const puppeteer = require("puppeteer");
 
 const userAuthData = {
   loginfield: process.env.CT_USERNAME,
@@ -19,8 +25,8 @@ const initBrowser = async () => {
     width: 1280,
     deviceScaleFactor: 2,
   });
-  await page.goto('https://cybertalents.com/login', {
-    waitUntil: 'networkidle2',
+  await page.goto("https://cybertalents.com/login", {
+    waitUntil: "networkidle2",
   });
   page.setDefaultNavigationTimeout(0);
   return { browser, page };
@@ -32,13 +38,13 @@ const performLogin = async (page) => {
   await page.click('[type="submit"]');
   await page.waitForNavigation();
 
-  await page.goto('https://cybertalents.com/challenges', {
-    waitUntil: 'networkidle2',
+  await page.goto("https://cybertalents.com/challenges", {
+    waitUntil: "networkidle2",
   });
 };
 
 (async () => {
-  print('[-] Starting Browser...', false);
+  print("[-] Starting Browser...", false);
   const { browser, page } = await initBrowser();
   print(`\r[+] Browser Started\n`, true);
   print(`[-] Authenticating...`, false);
