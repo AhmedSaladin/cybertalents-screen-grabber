@@ -216,30 +216,30 @@ const saveLesson = async (page) => {
   await saveChallenges(page, courses[index].lessons[i], lessonPath);
 };
 
+const savePracticeLessons = async (page, courses, index) => {
+  const challengesBar = loadingBar.create(courses[index].challenges.length, 1, {
+    title: courses[index].name,
+  });
+  for (let i = 0; i < courses[index].challenges.length; i++) {
+    const url = courses[index].challenges[i].url;
+    const challengeName = courses[index].challenges[i].name;
+    const challengePath = `${coursePath}Practice${fileSeparator()}${
+      courses[index].name
+    }${fileSeparator()}${challengeName}${fileSeparator()}`;
+    fs.mkdirSync(challengePath, { recursive: true });
+    await savechallenge(page, url, challengePath);
+    await saveWriteUp(page, url, challengePath);
+    challengesBar.increment();
+  }
+  loadingBar.remove(challengesBar);
+};
+
 const savePageLessons = async (page, courses, target) => {
   try {
     for (let index = 0; index < courses.length; index++) {
       const coursePath = `${__dirname}${fileSeparator()}CyberTalents${fileSeparator()}`;
       if (target === "PRACTICE") {
-        const challengesBar = loadingBar.create(
-          courses[index].challenges.length,
-          1,
-          {
-            title: courses[index].name,
-          }
-        );
-        for (let i = 0; i < courses[index].challenges.length; i++) {
-          const url = courses[index].challenges[i].url;
-          const challengeName = courses[index].challenges[i].name;
-          const challengePath = `${coursePath}Practice${fileSeparator()}${
-            courses[index].name
-          }${fileSeparator()}${challengeName}${fileSeparator()}`;
-          fs.mkdirSync(challengePath, { recursive: true });
-          await savechallenge(page, url, challengePath);
-          await saveWriteUp(page, url, challengePath);
-          challengesBar.increment();
-        }
-        loadingBar.remove(challengesBar);
+        await savePracticeLessons(page, courses, index);
       } else {
         const lessonsBar = loadingBar.create(courses[index].lessons.length, 1, {
           title: courses[index].name,
