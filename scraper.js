@@ -126,7 +126,7 @@ const loadingBar = new cliProgress.MultiBar(
   cliProgress.Presets.legacy
 );
 
-const getPracticeLessons = async (page, courses) => {
+const getPracticeLessons = async (page, courses, index) => {
   courses[index].challenges = await page.evaluate(() => {
     const challenges = [];
     const challengesContainer = document.querySelectorAll(
@@ -144,31 +144,32 @@ const getPracticeLessons = async (page, courses) => {
   });
 };
 
+const getLearnLessons = async (page, courses, index) => {
+  courses[index].lessons = await page.evaluate(() => {
+    const lessons = [];
+    const lessonsContainer = document.querySelectorAll(
+      '[class="competition-name ml-8 w-full"]'
+    );
+    lessonsContainer.forEach((lesson) => {
+      let name = lesson.textContent.trim().replaceAll("-", "- ");
+      name = name.substring(0, name.indexOf("(")).trim();
+      lessons.push({
+        name: name,
+        url: lesson.parentElement.parentElement.parentElement.href,
+      });
+    });
+    return lessons;
+  });
+};
+
 const getLessons = async (page, courses, target) => {
   try {
     for (let index = 0; index < courses.length; index++) {
       await page.goto(courses[index].url, {
         waitUntil: "networkidle2",
       });
-      if (target === "PRACTICE") {
-        await getPracticeLessons(page, courses);
-      } else {
-        courses[index].lessons = await page.evaluate(() => {
-          const lessons = [];
-          const lessonsContainer = document.querySelectorAll(
-            '[class="competition-name ml-8 w-full"]'
-          );
-          lessonsContainer.forEach((les) => {
-            let name = les.textContent.trim().replaceAll("-", "- ");
-            name = name.substring(0, name.indexOf("(")).trim();
-            lessons.push({
-              name: name,
-              url: les.parentElement.parentElement.parentElement.href,
-            });
-          });
-          return lessons;
-        });
-      }
+      if (target === "PRACTICE") await getPracticeLessons(page, courses, index);
+      else await getLearnLessons(page, courses, index);
       return courses;
     }
   } catch (err) {
