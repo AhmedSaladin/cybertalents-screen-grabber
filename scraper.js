@@ -17,11 +17,22 @@ const getAvailableCourses = async (page) => {
     return await page.evaluate(() => {
       const courses = [];
       document.querySelectorAll(".card-cat").forEach((element) => {
-        const parent = element.parentElement.parentElement;
-        courses.push({
-          name: element.textContent.trim(),
-          url: parent.children[parent.childElementCount - 1].children[1].href,
-        });
+        if (element.childElementCount < 2) {
+          courses.push({
+            name: element.children[0].children[0].textContent.trim(),
+            url: element.children[0].children[1].children[2].href,
+          });
+        } else if (element.childElementCount > 2) {
+          courses.push({
+            name: element.children[1].textContent.trim(),
+            url: element.children[2].children[2].href,
+          });
+        } else {
+          courses.push({
+            name: element.children[0].textContent.trim(),
+            url: element.children[1].children[2].href,
+          });
+        }
       });
       return courses;
     });
