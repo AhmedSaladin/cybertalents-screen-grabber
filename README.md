@@ -32,7 +32,7 @@ When `PUPPETEER_SKIP_CHROMIUM_DOWNLOAD` is set to `true`, puppeteer skips downlo
     - ssh
 
     ```bash
-      git clone git@github.com:AhmedAshrafAZ/cybertalents-screen-grabber.git
+      git clone git@github.com:AhmedSaladin/cybertalents-screen-grabber.git
     ```
 2.  Navigate to the script directory
 
