@@ -126,6 +126,24 @@ const loadingBar = new cliProgress.MultiBar(
   cliProgress.Presets.legacy
 );
 
+const getPracticeLessons = async (page, courses) => {
+  courses[index].challenges = await page.evaluate(() => {
+    const challenges = [];
+    const challengesContainer = document.querySelectorAll(
+      '[class="card flex mb-4 challenge-card"]'
+    );
+    challengesContainer.forEach((challenge) => {
+      const target =
+        challenge.children[0].children[0].children[0].firstElementChild;
+      challenges.push({
+        name: target.innerText,
+        url: target.href,
+      });
+    });
+    return challenges;
+  });
+};
+
 const getLessons = async (page, courses, target) => {
   try {
     for (let index = 0; index < courses.length; index++) {
@@ -133,21 +151,7 @@ const getLessons = async (page, courses, target) => {
         waitUntil: "networkidle2",
       });
       if (target === "PRACTICE") {
-        courses[index].challenges = await page.evaluate(() => {
-          const challenges = [];
-          const challengesContainer = document.querySelectorAll(
-            '[class="card flex mb-4 challenge-card"]'
-          );
-          challengesContainer.forEach((challenge) => {
-            const target =
-              challenge.children[0].children[0].children[0].firstElementChild;
-            challenges.push({
-              name: target.innerText,
-              url: target.href,
-            });
-          });
-          return challenges;
-        });
+        await getPracticeLessons(page, courses);
       } else {
         courses[index].lessons = await page.evaluate(() => {
           const lessons = [];
