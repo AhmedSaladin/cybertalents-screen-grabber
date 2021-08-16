@@ -126,29 +126,47 @@ const loadingBar = new cliProgress.MultiBar(
   cliProgress.Presets.legacy
 );
 
-const getLessons = async (page, courses) => {
+const getLessons = async (page, courses, target) => {
   try {
     for (let index = 0; index < courses.length; index++) {
       await page.goto(courses[index].url, {
         waitUntil: "networkidle2",
       });
-      courses[index].challenges = await page.evaluate(() => {
-        const challenges = [];
-        const challengesContainer = document.querySelectorAll(
-          '[class="card flex mb-4 challenge-card"]'
-        );
-        challengesContainer.forEach((challenge) => {
-          const target =
-            challenge.children[0].children[0].children[0].firstElementChild;
-          challenges.push({
-            name: target.innerText,
-            url: target.href,
+      if (target === "PRACTICE") {
+        courses[index].challenges = await page.evaluate(() => {
+          const challenges = [];
+          const challengesContainer = document.querySelectorAll(
+            '[class="card flex mb-4 challenge-card"]'
+          );
+          challengesContainer.forEach((challenge) => {
+            const target =
+              challenge.children[0].children[0].children[0].firstElementChild;
+            challenges.push({
+              name: target.innerText,
+              url: target.href,
+            });
           });
+          return challenges;
         });
-        return challenges;
-      });
+      } else {
+        courses[index].lessons = await page.evaluate(() => {
+          const lessons = [];
+          const lessonsContainer = document.querySelectorAll(
+            '[class="competition-name ml-8 w-full"]'
+          );
+          lessonsContainer.forEach((les) => {
+            let name = les.textContent.trim().replaceAll("-", "- ");
+            name = name.substring(0, name.indexOf("(")).trim();
+            lessons.push({
+              name: name,
+              url: les.parentElement.parentElement.parentElement.href,
+            });
+          });
+          return lessons;
+        });
+      }
+      return courses;
     }
-    return courses;
   } catch (err) {
     console.log(err);
   }
