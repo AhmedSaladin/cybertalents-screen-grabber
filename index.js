@@ -6,6 +6,7 @@ const {
   getAnswers,
   getLessons,
   saveLessons,
+  selectTarget,
 } = require("./scraper.js");
 const puppeteer = require("puppeteer");
 
@@ -37,10 +38,6 @@ const performLogin = async (page) => {
   await page.type('[name="password"]', userAuthData.password);
   await page.click('[type="submit"]');
   await page.waitForNavigation();
-
-  await page.goto("https://cybertalents.com/challenges", {
-    waitUntil: "networkidle2",
-  });
 };
 
 (async () => {
@@ -50,13 +47,15 @@ const performLogin = async (page) => {
   print(`[-] Authenticating...`, false);
   await performLogin(page);
   print(`\r[+] Authenticated\n`, true);
-  const availableCourses = await getAvailableCourses(page);
-  let selectedCourses = await getAnswers(availableCourses);
-  print(`[-] Fetching Lessons of each course...`, false);
-  selectedCourses = await getLessons(page, selectedCourses);
-  print(`\r[+] Lessons Fetched\n`, true);
-  await saveLessons(page, selectedCourses);
-  await browser.close();
-  print(`\r[+] Downloaded and saved to "CyberTalentsLearn" folder\n`, true);
+  const target = await selectTarget(page);
+
+  // const availableCourses = await getAvailableCourses(page);
+  // let selectedCourses = await getAnswers(availableCourses);
+  // print(`[-] Fetching Lessons of each course...`, false);
+  // selectedCourses = await getLessons(page, selectedCourses);
+  // print(`\r[+] Lessons Fetched\n`, true);
+  // await saveLessons(page, selectedCourses);
+  // await browser.close();
+  // print(`\r[+] Downloaded and saved to "CyberTalentsLearn" folder\n`, true);
   process.exit();
 })();

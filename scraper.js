@@ -12,6 +12,31 @@ const print = (text, clearLine) => {
   process.stdout.write(text);
 };
 
+const selectTarget = async (page) => {
+  const answer = await inquirer.prompt([
+    {
+      type: "list",
+      message: "Select target page",
+      name: "target",
+      choices: ["LEARN", "PRACTICE"],
+    },
+  ]);
+
+  if (answer.target === "LEARN") {
+    await page.goto("https://cybertalents.com/learn", {
+      waitUntil: "networkidle2",
+    });
+    return "LEARN";
+  }
+
+  if (answer.target === "PRACTICE") {
+    await page.goto("https://cybertalents.com/challenges", {
+      waitUntil: "networkidle2",
+    });
+    return "PRACTICE";
+  }
+};
+
 const getAvailableCourses = async (page) => {
   try {
     return await page.evaluate(() => {
@@ -175,4 +200,5 @@ module.exports = {
   getAnswers,
   getLessons,
   saveLessons,
+  selectTarget,
 };
