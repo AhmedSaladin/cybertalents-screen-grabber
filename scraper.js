@@ -207,30 +207,55 @@ const saveWriteUp = async (page, url, challengePath) => {
   });
 };
 
-const saveLessons = async (page, courses) => {
+const saveLesson = async (page) => {
+  await cleanupScreen(page);
+  await page.screenshot({
+    path: `${lessonPath}lesson.png`,
+    fullPage: true,
+  });
+  await saveChallenges(page, courses[index].lessons[i], lessonPath);
+};
+
+const saveLessons = async (page, courses, target) => {
   try {
     for (let index = 0; index < courses.length; index++) {
-      const coursePath = `${__dirname}${fileSeparator()}CyberTalentsLearn${fileSeparator()}${
+      const coursePath = `${__dirname}${fileSeparator()}CyberTalents${fileSeparator()}${
         courses[index].name
       }${fileSeparator()}`;
-      const challengesBar = loadingBar.create(
-        courses[index].challenges.length,
-        1,
-        {
-          title: courses[index].name,
+      if (target === "PRACTICE") {
+        const challengesBar = loadingBar.create(
+          courses[index].challenges.length,
+          1,
+          {
+            title: courses[index].name,
+          }
+        );
+        for (let i = 0; i < courses[index].challenges.length; i++) {
+          const url = courses[index].challenges[i].url;
+          const challengeName = courses[index].challenges[i].name;
+          const challengePath = `${coursePath}${challengeName}${fileSeparator()}`;
+          fs.mkdirSync(challengePath, { recursive: true });
+          await savechallenge(page, url, challengePath);
+          await saveWriteUp(page, url, challengePath);
+          challengesBar.increment();
         }
-      );
-
-      for (let i = 0; i < courses[index].challenges.length; i++) {
-        const url = courses[index].challenges[i].url;
-        const challengeName = courses[index].challenges[i].name;
-        const challengePath = `${coursePath}${challengeName}${fileSeparator()}`;
-        fs.mkdirSync(challengePath, { recursive: true });
-        await savechallenge(page, url, challengePath);
-        await saveWriteUp(page, url, challengePath);
-        challengesBar.increment();
+        loadingBar.remove(challengesBar);
+      } else {
+        const lessonsBar = loadingBar.create(courses[index].lessons.length, 1, {
+          title: courses[index].name,
+        });
+        for (let i = 0; i < courses[index].lessons.length; i++) {
+          await page.goto(courses[index].lessons[i].url, {
+            waitUntil: "networkidle2",
+          });
+          const lessonName = courses[index].lessons[i].name;
+          const lessonPath = `${coursePath}${lessonName}${fileSeparator()}`;
+          fs.mkdirSync(lessonPath, { recursive: true });
+          saveLesson(page);
+          lessonsBar.increment();
+        }
+        loadingBar.remove(lessonsBar);
       }
-      loadingBar.remove(challengesBar);
     }
     loadingBar.stop();
   } catch (err) {
