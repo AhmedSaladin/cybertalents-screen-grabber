@@ -53,34 +53,35 @@ const getLearnPageCourses = async (page) => {
   });
 };
 
+const getPracticePageCourses = async (page) => {
+  return await page.evaluate(() => {
+    const courses = [];
+    document.querySelectorAll(".card-cat").forEach((element) => {
+      if (element.childElementCount < 2) {
+        courses.push({
+          name: element.children[0].children[0].textContent.trim(),
+          url: element.children[0].children[1].children[2].href,
+        });
+      } else if (element.childElementCount > 2) {
+        courses.push({
+          name: element.children[1].textContent.trim(),
+          url: element.children[2].children[2].href,
+        });
+      } else {
+        courses.push({
+          name: element.children[0].textContent.trim(),
+          url: element.children[1].children[2].href,
+        });
+      }
+    });
+    return courses;
+  });
+};
+
 const getAvailableCourses = async (page, target) => {
   try {
-    if (target === "LEARN") {
-      return await getLearnPageCourses(page);
-    } else if (target === "PRACTICE") {
-      return await page.evaluate(() => {
-        const courses = [];
-        document.querySelectorAll(".card-cat").forEach((element) => {
-          if (element.childElementCount < 2) {
-            courses.push({
-              name: element.children[0].children[0].textContent.trim(),
-              url: element.children[0].children[1].children[2].href,
-            });
-          } else if (element.childElementCount > 2) {
-            courses.push({
-              name: element.children[1].textContent.trim(),
-              url: element.children[2].children[2].href,
-            });
-          } else {
-            courses.push({
-              name: element.children[0].textContent.trim(),
-              url: element.children[1].children[2].href,
-            });
-          }
-        });
-        return courses;
-      });
-    }
+    if (target === "LEARN") return await getLearnPageCourses(page);
+    if (target === "PRACTICE") return await getPracticePageCourses(page);
   } catch (err) {
     console.log(err);
   }
