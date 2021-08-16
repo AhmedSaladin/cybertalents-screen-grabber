@@ -10,7 +10,7 @@ const userAuthData = {
 
 const initBrowser = async () => {
   const browser = await puppeteer.launch({
-    headless: true,
+    headless: false,
     timeout: 100000,
   });
   const page = await browser.newPage();
@@ -32,7 +32,7 @@ const performLogin = async (page) => {
   await page.click('[type="submit"]');
   await page.waitForNavigation();
 
-  await page.goto('https://cybertalents.com/learn', {
+  await page.goto('https://cybertalents.com/challenges', {
     waitUntil: 'networkidle2',
   });
 };
