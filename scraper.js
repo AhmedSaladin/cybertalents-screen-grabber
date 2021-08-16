@@ -61,7 +61,7 @@ const getAnswers = async (availableCourses) => {
     return answers.courses.map((course) => {
       return {
         name: course,
-        url: availableCourses.find((c) => c.name === course).url,
+        url: availableCourses.find((crs) => crs.name === course).url,
       };
     });
   } catch (err) {
@@ -92,15 +92,11 @@ const getLessons = async (page, courses) => {
           '[class="card flex mb-4 challenge-card"]'
         );
         challengesContainer.forEach((challenge) => {
-          const name =
-            challenge.children[0].children[0].children[0].firstElementChild
-              .innerText;
-          const link =
-            challenge.children[0].children[0].children[0].firstElementChild
-              .href;
+          const target =
+            challenge.children[0].children[0].children[0].firstElementChild;
           challenges.push({
-            name: name,
-            url: link,
+            name: target.innerText,
+            url: target.href,
           });
         });
         return challenges;
@@ -112,6 +108,36 @@ const getLessons = async (page, courses) => {
   }
 };
 
+const cleanupScreen = async (page) => {
+  return await page.evaluate(() => {
+    document.getElementById("stu").style.display = "none";
+    document.getElementsByTagName("footer")[0].style.display = "none";
+    document.getElementsByClassName("go2top")[0].style.display = "none";
+  });
+};
+
+const getchallenge = async (page, url, challengePath) => {
+  await page.goto(url, {
+    waitUntil: "networkidle2",
+  });
+  await cleanupScreen(page);
+  await page.screenshot({
+    path: `${challengePath}challenge.png`,
+    fullPage: true,
+  });
+};
+
+const getWriteUps = async (page, url, challengePath) => {
+  await page.goto(`${url}/writeups`, {
+    waitUntil: "networkidle2",
+  });
+  await cleanupScreen(page);
+  await page.screenshot({
+    path: `${challengePath}writeup.png`,
+    fullPage: true,
+  });
+};
+
 const saveLessons = async (page, courses) => {
   try {
     for (let index = 0; index < courses.length; index++) {
@@ -119,40 +145,20 @@ const saveLessons = async (page, courses) => {
         courses[index].name
       }${fileSeparator()}`;
       const challengesBar = loadingBar.create(
-        courses[index].challenges.length + 1,
+        courses[index].challenges.length,
         1,
         {
           title: courses[index].name,
         }
       );
+
       for (let i = 0; i < courses[index].challenges.length; i++) {
-        await page.goto(courses[index].challenges[i].url, {
-          waitUntil: "networkidle2",
-        });
+        const url = courses[index].challenges[i].url;
         const challengeName = courses[index].challenges[i].name;
         const challengePath = `${coursePath}${challengeName}${fileSeparator()}`;
         fs.mkdirSync(challengePath, { recursive: true });
-        await page.evaluate(() => {
-          document.getElementById("stu").style.display = "none";
-          document.getElementsByTagName("footer")[0].style.display = "none";
-          document.getElementsByClassName("go2top")[0].style.display = "none";
-        });
-        await page.screenshot({
-          path: `${challengePath}challenge.png`,
-          fullPage: true,
-        });
-        await page.goto(`${courses[index].challenges[i].url}/writeups`, {
-          waitUntil: "networkidle2",
-        });
-        await page.evaluate(() => {
-          document.getElementById("stu").style.display = "none";
-          document.getElementsByTagName("footer")[0].style.display = "none";
-          document.getElementsByClassName("go2top")[0].style.display = "none";
-        });
-        await page.screenshot({
-          path: `${challengePath}writeup.png`,
-          fullPage: true,
-        });
+        await getchallenge(page, url, challengePath);
+        await getWriteUps(page, url, challengePath);
         challengesBar.increment();
       }
       loadingBar.remove(challengesBar);
