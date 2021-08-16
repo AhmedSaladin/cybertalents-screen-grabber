@@ -219,9 +219,7 @@ const saveLesson = async (page) => {
 const savePageLessons = async (page, courses, target) => {
   try {
     for (let index = 0; index < courses.length; index++) {
-      const coursePath = `${__dirname}${fileSeparator()}CyberTalents${fileSeparator()}${
-        courses[index].name
-      }${fileSeparator()}`;
+      const coursePath = `${__dirname}${fileSeparator()}CyberTalents${fileSeparator()}`;
       if (target === "PRACTICE") {
         const challengesBar = loadingBar.create(
           courses[index].challenges.length,
@@ -233,7 +231,9 @@ const savePageLessons = async (page, courses, target) => {
         for (let i = 0; i < courses[index].challenges.length; i++) {
           const url = courses[index].challenges[i].url;
           const challengeName = courses[index].challenges[i].name;
-          const challengePath = `${coursePath}${challengeName}${fileSeparator()}`;
+          const challengePath = `${coursePath}Practice${fileSeparator()}${
+            courses[index].name
+          }${fileSeparator()}${challengeName}${fileSeparator()}`;
           fs.mkdirSync(challengePath, { recursive: true });
           await savechallenge(page, url, challengePath);
           await saveWriteUp(page, url, challengePath);
@@ -249,7 +249,9 @@ const savePageLessons = async (page, courses, target) => {
             waitUntil: "networkidle2",
           });
           const lessonName = courses[index].lessons[i].name;
-          const lessonPath = `${coursePath}${lessonName}${fileSeparator()}`;
+          const lessonPath = `${coursePath}Learn${fileSeparator()}${
+            courses[index].name
+          }${lessonName}${fileSeparator()}`;
           fs.mkdirSync(lessonPath, { recursive: true });
           saveLesson(page);
           lessonsBar.increment();
