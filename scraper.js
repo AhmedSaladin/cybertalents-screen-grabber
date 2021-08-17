@@ -2,7 +2,7 @@
 require("dotenv").config();
 const inquirer = require("inquirer");
 const puppeteer = require("puppeteer");
-const { fileSeparator } = require("./helpers");
+const { fileSeparator, loadingBar } = require("./helpers");
 
 const {
   getPracticePageCourses,
