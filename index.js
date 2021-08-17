@@ -1,46 +1,20 @@
 "use strict";
-require("dotenv").config();
 const {
-  print,
+  initBrowser,
+  performLogin,
   getAvailableCourses,
   getAnswers,
   getPageLessons,
   savePageLessons,
   selectTarget,
 } = require("./scraper.js");
-const puppeteer = require("puppeteer");
 
-const userAuthData = {
-  loginfield: process.env.CT_USERNAME,
-  password: process.env.CT_PASSWORD,
+const print = (text, clearLine) => {
+  if (clearLine) process.stdout.clearLine();
+  process.stdout.write(text);
 };
 
-const initBrowser = async () => {
-  const browser = await puppeteer.launch({
-    headless: true,
-    timeout: 100000,
-  });
-  const page = await browser.newPage();
-  page.setViewport({
-    height: 720,
-    width: 1280,
-    deviceScaleFactor: 2,
-  });
-  await page.goto("https://cybertalents.com/login", {
-    waitUntil: "networkidle2",
-  });
-  page.setDefaultNavigationTimeout(0);
-  return { browser, page };
-};
-
-const performLogin = async (page) => {
-  await page.type('[name="loginfield"]', userAuthData.loginfield);
-  await page.type('[name="password"]', userAuthData.password);
-  await page.click('[type="submit"]');
-  await page.waitForNavigation();
-};
-
-(async () => {
+const mainScreen = async () => {
   print("[-] Starting Browser...", false);
   const { browser, page } = await initBrowser();
   print(`\r[+] Browser Started\n`, true);
@@ -57,4 +31,6 @@ const performLogin = async (page) => {
   await browser.close();
   print(`\r[+] Downloaded and saved to "CyberTalents" folder\n`, true);
   process.exit();
-})();
+};
+
+mainScreen();
