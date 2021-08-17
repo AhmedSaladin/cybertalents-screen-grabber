@@ -1,9 +1,13 @@
 "use strict";
 const inquirer = require("inquirer");
 const fs = require("fs");
-const cliProgress = require("cli-progress");
-const { savechallenge, saveWriteUp, saveLesson } = require("./helpers");
-
+const {
+  savechallenge,
+  saveWriteUp,
+  saveLesson,
+  loadingBar,
+  fileSeparator,
+} = require("./helpers");
 
 const print = (text, clearLine) => {
   if (clearLine) process.stdout.clearLine();
@@ -51,8 +55,6 @@ const getLearnPageCourses = async (page) => {
   });
 };
 
-
-
 const getAvailableCourses = async (page, target) => {
   try {
     if (target === "PRACTICE") return await getPracticePageCourses(page);
@@ -90,19 +92,6 @@ const getAnswers = async (availableCourses) => {
   }
 };
 
-const loadingBar = new cliProgress.MultiBar(
-  {
-    format: `Capturing ({value}/{total}): {title} | [{bar}] | ETA: {eta}s `,
-    barCompleteChar: "#",
-    barIncompleteChar: ".",
-    hideCursor: true,
-    clearOnComplete: true,
-  },
-  cliProgress.Presets.legacy
-);
-
-
-
 const getLearnLessons = async (page, course) => {
   course.lessons = await page.evaluate(() => {
     const lessons = [];
@@ -135,8 +124,6 @@ const getPageLessons = async (page, courses, target) => {
     console.log(err);
   }
 };
-
-
 
 const getLearnChallenges = async (page, url) => {
   await page.goto(url, {
