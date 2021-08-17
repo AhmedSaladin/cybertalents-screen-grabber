@@ -207,13 +207,12 @@ const saveWriteUp = async (page, url, challengePath) => {
   });
 };
 
-const saveLesson = async (page) => {
+const saveLesson = async (page, path) => {
   await cleanupScreen(page);
   await page.screenshot({
-    path: `${lessonPath}lesson.png`,
+    path: `${path}lesson.png`,
     fullPage: true,
   });
-  await saveChallenges(page, courses[index].lessons[i], lessonPath);
 };
 
 const savePracticeLessons = async (page, courses, index, path) => {
@@ -234,6 +233,50 @@ const savePracticeLessons = async (page, courses, index, path) => {
   loadingBar.remove(challengesBar);
 };
 
+const getLearnChallenges = async (page, url) => {
+  await page.goto(url, {
+    waitUntil: "networkidle2",
+  });
+  return await page.evaluate(() => {
+    const challenges = [];
+    document
+      .querySelectorAll('[class="card flex mb-4 challenge-card"]')
+      .forEach((element) => {
+        challenges.push({
+          name: element.children[0].children[0].children[0].children[0].text
+            .trim()
+            .replace("?", " "),
+          level:
+            element.children[0].children[0].children[1].children[1].textContent.trim(),
+          url: element.children[0].children[0].children[0].children[0].href,
+        });
+      });
+    return challenges;
+  });
+};
+
+const saveLearnChallenges = async (page, lesson, path) => {
+  const challenges = await getLearnChallenges(page, `${lesson.url}/challenges`);
+  fs.mkdirSync(`${path}challenges${fileSeparator()}`, {
+    recursive: true,
+  });
+  const challengesBar = loadingBar.create(challenges.length, 1, {
+    title: "challenge",
+  });
+  for (let i = 0; i < challenges.length; i++) {
+    const challengePath = `${path}challenges${fileSeparator()}[${challenges[
+      i
+    ].level
+      .substring(challenges[i].level.indexOf(":") + 1)
+      .trim()}] ${challenges[i].name}${fileSeparator()}`;
+    fs.mkdirSync(challengePath, { recursive: true });
+    await savechallenge(page, challenges[i].url, challengePath);
+    await saveWriteUp(page, challenges[i].url, challengePath);
+    challengesBar.increment();
+  }
+  loadingBar.remove(challengesBar);
+};
+
 const saveLearnLessons = async (page, courses, index, path) => {
   const lessonsBar = loadingBar.create(courses[index].lessons.length, 1, {
     title: courses[index].name,
@@ -245,9 +288,10 @@ const saveLearnLessons = async (page, courses, index, path) => {
     const lessonName = courses[index].lessons[i].name;
     const lessonPath = `${path}Learn${fileSeparator()}${
       courses[index].name
-    }${lessonName}${fileSeparator()}`;
+    }${fileSeparator()}${lessonName}${fileSeparator()}`;
     fs.mkdirSync(lessonPath, { recursive: true });
-    saveLesson(page);
+    await saveLesson(page, lessonPath);
+    await saveLearnChallenges(page, courses[index].lessons[i], lessonPath);
     lessonsBar.increment();
   }
   loadingBar.remove(lessonsBar);
