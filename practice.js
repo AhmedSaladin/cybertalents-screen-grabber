@@ -1,4 +1,4 @@
-const { savechallenge, saveWriteUp } = require("./helpers");
+const { savechallenge, saveWriteUp, fileSeparator } = require("./helpers");
 const getPracticePageCourses = async (page) => {
   return await page.evaluate(() => {
     const courses = [];
