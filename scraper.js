@@ -136,7 +136,7 @@ const getPracticeLessons = async (page, courses, index) => {
       const target =
         challenge.children[0].children[0].children[0].firstElementChild;
       challenges.push({
-        name: target.innerText,
+        name: target.innerText.replace("?", " "),
         url: target.href,
       });
     });
