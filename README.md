@@ -6,7 +6,7 @@
 
 ## Script description
 
-This script is created to automate downloading the content from the [Cyber Talents](https://cybertalents.com/) platform. It fetches the courses in [practice](https://cybertalents.com/challenges) section, creates a folder for each challenge, take screenshots for each challenge with its writeup and save it in the corresponding folder 🔥🔥
+This script is created to automate downloading the content from the [Cyber Talents](https://cybertalents.com/) platform. It creates a folder for each challenge, take screenshots for each challenge with its writeup and save it in the corresponding folder 🔥🔥
 
 ## Skip chromium installation "If you have chromium installed already"
 
@@ -63,6 +63,13 @@ When `PUPPETEER_SKIP_CHROMIUM_DOWNLOAD` is set to `true`, puppeteer skips downlo
     npm start
     ```
 
-## The Origanal Repo 👌
+## Showcase 🤓
 
-[Ahmed Ashraf AZ](https://github.com/AhmedAshrafAZ/cybertalents-screen-grabber)
+This script is mainly based on web scraping 🕷🕸 and DOM manipulation. Here is a demo of its use.
+
+https://user-images.githubusercontent.com/35408287/129457463-9e41d0f6-0e7b-4fb3-b115-52a6a45599d1.mp4
+
+## Contribution 👀
+
+This script is created for personal use but made public so if anyone wants to use it can use it. You might face some bugs or not handled errors, you can fix it and create a pull request or you can post a new issue in the issues section and I will fix it whenever I have the time.
+
