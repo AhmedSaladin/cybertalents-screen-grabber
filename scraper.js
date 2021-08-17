@@ -47,6 +47,7 @@ const performLogin = async (page) => {
 };
 
 const selectTarget = async (page) => {
+  let link = "";
   const answer = await inquirer.prompt([
     {
       type: "list",
@@ -55,20 +56,12 @@ const selectTarget = async (page) => {
       choices: ["LEARN", "PRACTICE"],
     },
   ]);
-
-  if (answer.target === "LEARN") {
-    await page.goto("https://cybertalents.com/learn", {
-      waitUntil: "networkidle2",
-    });
-    return "LEARN";
-  }
-
-  if (answer.target === "PRACTICE") {
-    await page.goto("https://cybertalents.com/challenges", {
-      waitUntil: "networkidle2",
-    });
-    return "PRACTICE";
-  }
+  if (answer.target === "LEARN") link = "https://cybertalents.com/learn";
+  else link = "https://cybertalents.com/challenges";
+  await page.goto(link, {
+    waitUntil: "networkidle2",
+  });
+  return answer.target;
 };
 
 const getAvailableCourses = async (page, target) => {
