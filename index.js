@@ -17,7 +17,7 @@ const userAuthData = {
 
 const initBrowser = async () => {
   const browser = await puppeteer.launch({
-    headless: false,
+    headless: true,
     timeout: 100000,
   });
   const page = await browser.newPage();
