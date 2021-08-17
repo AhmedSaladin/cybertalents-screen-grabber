@@ -9,6 +9,12 @@ const {
   fileSeparator,
 } = require("./helpers");
 
+const {
+  getPracticePageCourses,
+  getPracticeLessons,
+  savePracticeLessons,
+} = require("./practice");
+
 const print = (text, clearLine) => {
   if (clearLine) process.stdout.clearLine();
   process.stdout.write(text);
