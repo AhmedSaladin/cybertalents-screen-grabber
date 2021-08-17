@@ -80,8 +80,8 @@ const getPracticePageCourses = async (page) => {
 
 const getAvailableCourses = async (page, target) => {
   try {
-    if (target === "LEARN") return await getLearnPageCourses(page);
     if (target === "PRACTICE") return await getPracticePageCourses(page);
+    else return await getLearnPageCourses(page);
   } catch (err) {
     console.log(err);
   }
@@ -126,8 +126,8 @@ const loadingBar = new cliProgress.MultiBar(
   cliProgress.Presets.legacy
 );
 
-const getPracticeLessons = async (page, courses, index) => {
-  courses[index].challenges = await page.evaluate(() => {
+const getPracticeLessons = async (page, course) => {
+  course.challenges = await page.evaluate(() => {
     const challenges = [];
     const challengesContainer = document.querySelectorAll(
       '[class="card flex mb-4 challenge-card"]'
@@ -144,8 +144,8 @@ const getPracticeLessons = async (page, courses, index) => {
   });
 };
 
-const getLearnLessons = async (page, courses, index) => {
-  courses[index].lessons = await page.evaluate(() => {
+const getLearnLessons = async (page, course) => {
+  course.lessons = await page.evaluate(() => {
     const lessons = [];
     const lessonsContainer = document.querySelectorAll(
       '[class="competition-name ml-8 w-full"]'
@@ -168,10 +168,10 @@ const getPageLessons = async (page, courses, target) => {
       await page.goto(courses[index].url, {
         waitUntil: "networkidle2",
       });
-      if (target === "PRACTICE") await getPracticeLessons(page, courses, index);
-      else await getLearnLessons(page, courses, index);
-      return courses;
+      if (target === "PRACTICE") await getPracticeLessons(page, courses[index]);
+      else await getLearnLessons(page, courses[index]);
     }
+    return courses;
   } catch (err) {
     console.log(err);
   }
@@ -215,15 +215,15 @@ const saveLesson = async (page, path) => {
   });
 };
 
-const savePracticeLessons = async (page, courses, index, path) => {
-  const challengesBar = loadingBar.create(courses[index].challenges.length, 1, {
-    title: courses[index].name,
+const savePracticeLessons = async (page, course, path) => {
+  const challengesBar = loadingBar.create(course.challenges.length, 1, {
+    title: course.name,
   });
-  for (let i = 0; i < courses[index].challenges.length; i++) {
-    const url = courses[index].challenges[i].url;
-    const challengeName = courses[index].challenges[i].name;
+  for (let i = 0; i < course.challenges.length; i++) {
+    const url = course.challenges[i].url;
+    const challengeName = course.challenges[i].name;
     const challengePath = `${path}Practice${fileSeparator()}${
-      courses[index].name
+      course.name
     }${fileSeparator()}${challengeName}${fileSeparator()}`;
     fs.mkdirSync(challengePath, { recursive: true });
     await savechallenge(page, url, challengePath);
@@ -277,21 +277,21 @@ const saveLearnChallenges = async (page, lesson, path) => {
   loadingBar.remove(challengesBar);
 };
 
-const saveLearnLessons = async (page, courses, index, path) => {
-  const lessonsBar = loadingBar.create(courses[index].lessons.length, 1, {
-    title: courses[index].name,
+const saveLearnLessons = async (page, course, path) => {
+  const lessonsBar = loadingBar.create(course.lessons.length, 1, {
+    title: course.name,
   });
-  for (let i = 0; i < courses[index].lessons.length; i++) {
-    await page.goto(courses[index].lessons[i].url, {
+  for (let i = 0; i < course.lessons.length; i++) {
+    await page.goto(course.lessons[i].url, {
       waitUntil: "networkidle2",
     });
-    const lessonName = courses[index].lessons[i].name;
+    const lessonName = course.lessons[i].name;
     const lessonPath = `${path}Learn${fileSeparator()}${
-      courses[index].name
+      course.name
     }${fileSeparator()}${lessonName}${fileSeparator()}`;
     fs.mkdirSync(lessonPath, { recursive: true });
     await saveLesson(page, lessonPath);
-    await saveLearnChallenges(page, courses[index].lessons[i], lessonPath);
+    await saveLearnChallenges(page, course.lessons[i], lessonPath);
     lessonsBar.increment();
   }
   loadingBar.remove(lessonsBar);
@@ -302,8 +302,8 @@ const savePageLessons = async (page, courses, target) => {
     for (let index = 0; index < courses.length; index++) {
       const coursePath = `${__dirname}${fileSeparator()}CyberTalents${fileSeparator()}`;
       if (target === "PRACTICE")
-        await savePracticeLessons(page, courses, index, coursePath);
-      else await saveLearnLessons(page, courses, index, coursePath);
+        await savePracticeLessons(page, courses[index], coursePath);
+      else await saveLearnLessons(page, courses[index], coursePath);
     }
     loadingBar.stop();
   } catch (err) {
