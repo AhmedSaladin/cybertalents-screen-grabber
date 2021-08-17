@@ -1,7 +1,6 @@
 const machine_type = process.platform;
 const cliProgress = require("cli-progress");
 
-
 const fileSeparator = () => {
   return machine_type === "win32" ? "\\" : "/";
 };
