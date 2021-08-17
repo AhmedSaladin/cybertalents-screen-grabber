@@ -1,3 +1,9 @@
+const machine_type = process.platform;
+
+const fileSeparator = () => {
+  return machine_type === "win32" ? "\\" : "/";
+};
+
 const cleanupScreen = async (page) => {
   return await page.evaluate(() => {
     document.getElementById("stu").style.display = "none";
@@ -39,4 +45,5 @@ module.exports = {
   savechallenge,
   saveWriteUp,
   saveLesson,
+  fileSeparator,
 };

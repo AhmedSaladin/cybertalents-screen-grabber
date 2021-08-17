@@ -3,10 +3,7 @@ const inquirer = require("inquirer");
 const fs = require("fs");
 const cliProgress = require("cli-progress");
 const { savechallenge, saveWriteUp, saveLesson } = require("./helpers");
-const machine_type = process.platform;
-const fileSeparator = () => {
-  return machine_type === "win32" ? "\\" : "/";
-};
+
 
 const print = (text, clearLine) => {
   if (clearLine) process.stdout.clearLine();
