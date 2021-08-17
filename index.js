@@ -55,6 +55,6 @@ const performLogin = async (page) => {
   print(`\r[+] Lessons Fetched\n`, true);
   await savePageLessons(page, selectedCourses, target);
   await browser.close();
-  print(`\r[+] Downloaded and saved to "CyberTalentsLearn" folder\n`, true);
+  print(`\r[+] Downloaded and saved to "CyberTalents" folder\n`, true);
   process.exit();
 })();
