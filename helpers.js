@@ -1,7 +1,7 @@
-const machine_type = process.platform;
 const cliProgress = require("cli-progress");
 
 const fileSeparator = () => {
+  const machine_type = process.platform;
   return machine_type === "win32" ? "\\" : "/";
 };
 
@@ -34,6 +34,7 @@ const saveWriteUp = async (page, url, challengePath) => {
     fullPage: true,
   });
 };
+
 const saveLesson = async (page, path) => {
   await cleanupScreen(page);
   await page.screenshot({
@@ -56,7 +57,7 @@ const loadingBar = new cliProgress.MultiBar(
 module.exports = {
   savechallenge,
   saveWriteUp,
-  saveLesson,
   fileSeparator,
   loadingBar,
+  saveLesson,
 };

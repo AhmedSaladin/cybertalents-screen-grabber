@@ -1,5 +1,6 @@
 "use strict";
 const inquirer = require("inquirer");
+const { fileSeparator } = require("./helpers");
 
 const {
   getPracticePageCourses,
